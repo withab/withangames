@@ -1,0 +1,275 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Mini Game</title>
+    </head>
+    <body>
+        
+        <div id="app">
+            <div id="menu" v-if="menu">
+                <h1 id="menu">T'as perdu !</h1>
+                <h2 id="menu">Score: {{ oldScore }}</h2>
+                <h2 id="menu">Meilleur Score: {{ bestScore }}</h2>
+                <button @click=backGame()>Retourner au jeu</button>
+            </div>
+            <div id="game" v-if="game">
+                <h1>Mini Game</h1>
+                <br />
+                <h2>Nombre de vie(s) restante(s): {{ life }} -------------------- Score: {{ score }} -------------------- Meilleur score: {{ bestScore}} </h2>
+                <br />
+                <br />
+                <br />
+                <button @click="left()">GAUCHE</button> <button @click="up()">HAUT</button> <button @click="right()">DROITE</button> 
+                <br />
+                <button @click="down()">BAS</button> 
+                <br />
+                <br />
+                <button @click="pauseGame()">PAUSE</button>     <button @click="reset()">STOP</button>                                                                          
+                <br />
+                <!-- <label for="speedValue">Base speed value:</label> -->
+                <!-- <input type="text" id="speedValue" name="speedValue" @keyup="submit()"> -->
+                <!-- <button @click="submit()">Soumettre</button> -->
+                <!-- <br /> -->
+                <br />
+                <canvas id="canvas" width="1200" height="300" style="border:1px solid #000000;">
+                </canvas>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+        <script>
+            let vm = new Vue({
+                el:"#app",
+                data: {
+                    game: true,
+                    menu: false,
+                    score: 0,
+                    oldScore: 0,
+                    bestScore: 0,
+                    oldPos: {
+                        x: 500,
+                        y: 250
+                    },
+                    pos: {
+                        x: 500,
+                        y: 250
+                    },
+                    blocks: [],
+                    speedBase: 1500,
+                    life: 3,
+                    invicible: false,
+                    multiplicator: 1,
+                    actualBlocks: [],
+                    pause: false
+                },
+                methods: {
+                    draw: function() {
+                        let canvas = document.getElementById("canvas");
+                        if (!canvas.getContext) return;
+                        let ctx = canvas.getContext("2d");
+
+                        ctx.clearRect(0, 0, 1200, 300)
+
+                        ctx.fillStyle = 'BLACK';
+                        ctx.fillRect(this.pos.x, this.pos.y, 50, 50);
+
+                        this.blocks.forEach(b => {
+                            ctx.clearRect(b.pos.x, b.pos.y, b.size, b.size)
+                            b.pos.x = b.pos.x - 5 * this.multiplicator
+                            ctx.fillStyle = b.color
+                            ctx.fillRect(b.pos.x, b.pos.y, b.size, b.size)
+                        })
+
+                    },
+                    up: function() {
+                        if(this.pause) return;
+                        if(this.pos.y == 0) return;
+                        this.oldPos = this.pos
+                        this.pos.y = this.pos.y - 10
+                    },
+                    down: function() {
+                        if(this.pause) return;
+                        if(this.pos.y == 250) return;
+                        this.oldPos = this.pos
+                        this.pos.y = this.pos.y + 10
+                    },
+                    left: function() {
+                        if(this.pause) return;
+                        if(this.pos.x == 0) return;
+                        this.oldPos == this.pos
+                        this.pos.x = this.pos.x - 10
+                    },
+                    right: function() {
+                        if(this.pause) return;
+                        if(this.pos.x == 1150) return;
+                        this.oldPos == this.pos
+                        this.pos.x = this.pos.x + 10 
+                    },
+                    newBlock: function() {
+                        let size = 50
+                        let height = Math.round(Math.random() * 25) * 10
+
+                        this.actualBlocks.forEach(ac => {
+                            while(ac < height + 60 && ac > height - 60) {
+                                height = Math.round(Math.random() * 25) * 10
+                            }
+                        })
+
+                        this.actualBlocks.push(height)
+
+                        let random = Math.random() * 100
+
+                        let Btype, Bcolor
+                        if(random < 8) {
+                            Btype = true
+                            Bcolor = 'GREEN'
+                        } else {
+                            Btype = false
+                            Bcolor = 'RED'
+                        }
+                        
+                        this.blocks.push({
+                            type: Btype,
+                            size: size,
+                            pos: {
+                                x: 1150,
+                                y: height
+                            },
+                            color: Bcolor,
+                            taken: false
+                        })
+                    },
+                    lostLife: function() {
+                        if(this.invicible == true) return;
+                        this.life = this.life - 1
+                        if(this.life == 0) {
+                            this.reset()
+                        }
+                        this.invicible = true
+                        setTimeout(() => {
+                            this.invicible = false
+                        }, 2500);
+                    },
+                    reset: function() {
+                        if(this.score > this.bestScore) this.bestScore = this.score
+                        this.oldScore = this.score
+                        this.score = 0
+                        this.pos = {
+                            x: 500,
+                            y: 250
+                        }
+                        this.life = 3
+                        this.blocks = []
+                        this.game = false
+                        this.menu = true
+                        setTimeout(() => {
+                            this.game = true
+                            this.menu = false
+                        }, 10000);
+
+                    },
+                    backGame: function() {
+                        this.game = true
+                        this.menu = false
+                    },
+                    pauseGame: function() {
+                        if(this.pause) {
+                            this.pause = false
+                        } else {
+                            this.pause = true
+                        }
+                    }
+                },
+                mounted: function() {
+
+                    window.addEventListener('keydown', (e) => {
+                        if (e.key == 'ArrowUp' || e.key == 'z') {
+                            this.up()
+                        } else if(e.key == 'ArrowDown' || e.key == 's') {
+                            this.down()
+                        } else if(e.key == "ArrowLeft" || e.key == "q") {
+                            this.left()
+                        } else if(e.key == "ArrowRight" || e.key == "d") {
+                            this.right()
+                        }
+                    })
+
+
+                    this.draw()
+
+                    //UPDATE
+                    setInterval(() => {
+                        if(!this.game) return;
+                        if(this.pause) return;
+                        this.draw()
+                        this.score = this.score + 1 * this.multiplicator
+                        if(this.score > this.bestScore) this.bestScore = this.score
+
+                        this.multiplicator = (Math.floor(this.score / 500) + 1)
+
+                    }, 100)
+
+                    //RANDOMSPAWN
+                
+                    setInterval(() => {
+                        if(this.pause) return;
+                        if(!this.game) return;
+                        let i = 0
+                        while(i != this.multiplicator) {
+                            if(i == 3) return;
+                            i++
+                            this.newBlock()
+                        }
+                    }, 1000 * Math.random() + this.speedBase);
+
+                    setInterval(() => {
+
+                        if(this.game == false) return;
+                        let canvas = document.getElementById("canvas");
+                        if (!canvas.getContext) return;
+                        let ctx = canvas.getContext("2d");
+
+                        let i = 0
+                        this.blocks.forEach(b => {
+
+                            //COLLISION
+
+                            if(this.invicible) return;
+
+                            var rect1 = {x: this.pos.x, y: this.pos.y, width: 50, height: 50}
+                            var rect2 = {x: b.pos.x + 5, y: b.pos.y + 5, width: 45, height: 45}
+
+                            if (rect1.x < rect2.x + rect2.width &&
+                                rect1.x + rect1.width > rect2.x &&
+                                rect1.y < rect2.y + rect2.height &&
+                                rect1.height + rect1.y > rect2.y) {
+                                    
+                                    if(b.type) {
+                                        if(b.taken) return;
+                                        this.life ++
+                                        this.blocks[i].taken = true
+                                    } else {
+                                        this.lostLife()
+                                    }
+                            }
+                        i++
+                        })
+                    }, 100);
+
+                }
+        
+            })
+        </script>
+        <style>
+            html {
+                text-align: center;
+            }
+            #menu {
+                font-size: 80px;
+                color: red;
+                padding: 30px;
+                font-family: Andale Mono, monospace;
+            }
+        </style>
+    </body>
+</html>
