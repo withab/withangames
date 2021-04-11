@@ -230,7 +230,7 @@
                         if(this.score > this.bestScore) this.bestScore = this.score
 
                         this.multiplicator = (Math.floor(this.score / 500) + 1)
-                        
+
                     }, 100)
 
                     //RANDOMSPAWN
@@ -240,14 +240,15 @@
                         if(!this.game) return;
                         let i = 0
                         while(i != this.multiplicator) {
-                            if(i != 3) {
+                            if(i == 3) return; 
                                 i++
                                 this.newBlock()
-                            }
                         }
                     }, 1000 * Math.random() + this.speedBase);
 
                     setInterval(() => {
+
+                        console.log(new Date().getTime(), this.pause, this)
 
                         if(this.game == false) return;
                         let canvas = document.getElementById("canvas");
