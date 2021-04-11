@@ -14,7 +14,7 @@
             </div>
             <div id="game" v-if="game">
                 <div class="info">
-                <h1>BlockGame    -     <a href="">Menu</a></h1>
+                <h1>BlockGame    -     <a href="http://withangames.herokuapp.com/">Menu</a></h1>
                 <h2>Nombre de vie(s) restante(s): {{ life }} -------------------- Score: {{ score }} -------------------- Meilleur score: {{ bestScore}} </h2>
                 <br />
                 <br />
@@ -79,7 +79,7 @@
                     lostLifeV: false,
                     multiplicator: 1,
                     actualBlocks: [],
-                    pause: false
+                    pause: false,
                 },
                 methods: {
                     draw: function() {
@@ -189,7 +189,7 @@
                         setTimeout(() => {
                             this.game = true
                             this.menu = false
-                        }, 10000);
+                        }, 15000);
 
                     },
                     backGame: function() {
@@ -258,8 +258,6 @@
 
                             //COLLISION
 
-                            if(this.invicible) return;
-
                             var rect1 = {x: this.pos.x, y: this.pos.y, width: 50, height: 50}
                             var rect2 = {x: b.pos.x + 5, y: b.pos.y + 5, width: 45, height: 45}
 
@@ -277,6 +275,7 @@
                                             this.winLife = false
                                         }, 2000);
                                     } else {
+                                        if(this.invicible) return;
                                         this.lostLife()
                                     }
                             }
@@ -297,7 +296,7 @@
 
             }
             #menu {
-                font-size: 70px;
+                font-size: 60px;
                 color: red;
                 padding: 30px;
                 font-family: Andale Mono, monospace;
