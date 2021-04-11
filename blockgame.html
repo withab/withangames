@@ -95,7 +95,7 @@
                         this.blocks.forEach(b => {
                             if(b.taken) return;
                             ctx.clearRect(b.pos.x, b.pos.y, b.size, b.size)
-                            b.pos.x = b.pos.x - 5 * (this.multiplicator * 2)
+                            b.pos.x = b.pos.x - 5 * (this.multiplicator)
                             ctx.fillStyle = b.color
                             ctx.fillRect(b.pos.x, b.pos.y, b.size, b.size)
                         })
