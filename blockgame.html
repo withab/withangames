@@ -1,0 +1,368 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>BlockGame</title>
+    </head>
+    <body>
+        
+        <div id="app">
+            <div id="menu" v-if="menu" class="info">
+                <h1 id="menu">T'as perdu !</h1>
+                <h2 id="menu">Score: {{ oldScore }}</h2>
+                <h2 id="menu">Meilleur Score: {{ bestScore }}</h2>
+                <button @click=backGame()>Retourner au jeu</button>
+            </div>
+            <div id="game" v-if="game">
+                <div class="info">
+                <h1>BlockGame    -     <a href="">Menu</a></h1>
+                <h2>Nombre de vie(s) restante(s): {{ life }} -------------------- Score: {{ score }} -------------------- Meilleur score: {{ bestScore}} </h2>
+                <br />
+                <br />
+                <br />
+                <br />
+                <button @click="pauseGame()">PAUSE</button>     <button @click="reset()">STOP</button>                                                                          
+                <br />
+                <br />
+            </div>
+            <div class="canvas">
+                <canvas id="canvas" width="1200" height="300" style="border:1px solid #000000;">
+                </canvas>
+            </div>
+            <div class="button">
+                <button @click="left()" id="left">GAUCHE</button> <button @click="up()" id="up">HAUT</button> <button @click="right()" id="right">DROITE</button> 
+                <br />
+                <br />
+                ----------------------- <button @click="down()" id="down">BAS</button> ----------------------
+            </div>
+            <br />
+            <br />
+            <br />
+            <div class="info">
+                <h2 id="Invicible" v-if="invicible" style="color: blue;">Invicibilité</h2>
+                <h2 id="winLife" v-if="winLife" style="color: green;">+1 Vie !</h2>
+                <h2 id="lostLife" v-if="lostLifeV" style="color: red;">-1 Vie !</h2>
+            </div>
+            </div>
+            <footer>By withan, 2021, BlockGame v1.1, no copyright, <a href="https://github.com/withab/blockgame">GitHub</a> </footer>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+        <script>
+            let vm = new Vue({
+                el:"#app",
+                data: {
+                    color: 'BLACK',
+                    game: true,
+                    menu: false,
+                    score: 0,
+                    oldScore: 0,
+                    bestScore: 0,
+                    oldPos: {
+                        x: 500,
+                        y: 250
+                    },
+                    pos: {
+                        x: 500,
+                        y: 250
+                    },
+                    blocks: [],
+                    speedBase: 1500,
+                    life: 3,
+                    invicible: false,
+                    winLife: false,
+                    lostLifeV: false,
+                    multiplicator: 1,
+                    actualBlocks: [],
+                    pause: false
+                },
+                methods: {
+                    draw: function() {
+                        let canvas = document.getElementById("canvas");
+                        if (!canvas.getContext) return;
+                        let ctx = canvas.getContext("2d");
+
+                        ctx.clearRect(0, 0, 1200, 300)
+
+                        ctx.fillStyle = 'BLACK';
+                        ctx.fillRect(this.pos.x, this.pos.y, 50, 50);
+
+                        this.blocks.forEach(b => {
+                            if(b.taken) return;
+                            ctx.clearRect(b.pos.x, b.pos.y, b.size, b.size)
+                            b.pos.x = b.pos.x - 5 * (this.multiplicator * 2)
+                            ctx.fillStyle = b.color
+                            ctx.fillRect(b.pos.x, b.pos.y, b.size, b.size)
+                        })
+
+                    },
+                    up: function() {
+                        if(this.pause) return;
+                        if(this.pos.y == 0) return;
+                        this.oldPos = this.pos
+                        this.pos.y = this.pos.y - 10
+                    },
+                    down: function() {
+                        if(this.pause) return;
+                        if(this.pos.y == 250) return;
+                        this.oldPos = this.pos
+                        this.pos.y = this.pos.y + 10
+                    },
+                    left: function() {
+                        if(this.pause) return;
+                        if(this.pos.x == 0) return;
+                        this.oldPos == this.pos
+                        this.pos.x = this.pos.x - 10
+                    },
+                    right: function() {
+                        if(this.pause) return;
+                        if(this.pos.x == 1150) return;
+                        this.oldPos == this.pos
+                        this.pos.x = this.pos.x + 10 
+                    },
+                    newBlock: function() {
+                        let size = 50
+                        let height = Math.round(Math.random() * 25) * 10
+
+                        this.actualBlocks.forEach(ac => {
+                            while(ac < height + 60 && ac > height - 60) {
+                                height = Math.round(Math.random() * 25) * 10
+                            }
+                        })
+
+                        this.actualBlocks.push(height)
+
+                        let random = Math.random() * 100
+
+                        let Btype, Bcolor
+                        
+                        if(random < 8) {
+                            Btype = true
+                            Bcolor = 'GREEN'
+                        } 
+                        else {
+                            Btype = false
+                            Bcolor = 'RED'
+                        }
+                        
+                        this.blocks.push({
+                            type: Btype,
+                            size: size,
+                            pos: {
+                                x: 1150,
+                                y: height
+                            },
+                            color: Bcolor,
+                            taken: false
+                        })
+                    },
+                    lostLife: function() {
+                        if(this.invicible == true) return;
+                        this.life = this.life - 1
+                        if(this.life == 0) {
+                            this.reset()
+                        }
+                        this.invicible = true
+                        this.lostLifeV = true
+                        setTimeout(() => {
+                            this.invicible = false
+                            this.lostLifeV = false
+                        }, 2000);
+                    },
+                    reset: function() {
+                        if(this.score > this.bestScore) this.bestScore = this.score
+                        this.oldScore = this.score
+                        this.score = 0
+                        this.pos = {
+                            x: 500,
+                            y: 250
+                        }
+                        this.life = 3
+                        this.blocks = []
+                        this.game = false
+                        this.menu = true
+                        setTimeout(() => {
+                            this.game = true
+                            this.menu = false
+                        }, 10000);
+
+                    },
+                    backGame: function() {
+                        this.game = true
+                        this.menu = false
+                    },
+                    pauseGame: function() {
+                        if(this.pause) {
+                            this.pause = false
+                        } else {
+                            this.pause = true
+                        }
+                    }
+                },
+                mounted: function() {
+
+                    window.addEventListener('keydown', (e) => {
+                        if (e.key == 'ArrowUp' || e.key == 'z') {
+                            this.up()
+                        } else if(e.key == 'ArrowDown' || e.key == 's') {
+                            this.down()
+                        } else if(e.key == "ArrowLeft" || e.key == "q") {
+                            this.left()
+                        } else if(e.key == "ArrowRight" || e.key == "d") {
+                            this.right()
+                        }
+                    })
+
+                    let upclicked = false
+                    let downclicked = false
+                    let leftclicked = false
+                    let rightclicked = false
+                    document.getElementById('up').onmousedown = function(){
+                        upclicked = true
+                        document.getElementById('up').onmouseup = function(){
+                        upclicked = false
+                        }
+                    }
+                    document.getElementById('down').onmousedown = function(){
+                        downclicked = true
+                        document.getElementById('down').onmouseup = function(){
+                        downclicked = false
+                        }
+                    }
+                    document.getElementById('left').onmousedown = function(){
+                        leftclicked = true
+                        document.getElementById('left').onmouseup = function(){
+                        leftclicked = false
+                        }
+                    }
+                    document.getElementById('right').onmousedown = function(){
+                        rightclicked = true
+                        document.getElementById('right').onmouseup = function(){
+                        rightclicked = false
+                        }
+                    }
+                    
+
+
+                    this.draw()
+
+                    //UPDATE
+                    setInterval(() => {
+                        if(!this.game) return;
+                        if(this.pause) return;
+                        this.draw()
+                        this.score = this.score + 1 * this.multiplicator
+                        if(this.score > this.bestScore) this.bestScore = this.score
+
+                        this.multiplicator = (Math.floor(this.score / 500) + 1)
+
+
+                        if(upclicked == true) {
+                            this.up()
+                        } else if(downclicked == true) {
+                            this.down()
+                        } else if(leftclicked == true) {
+                            this.left()
+                        }
+                        else if(rightclicked == true) {
+                            this.right()
+                        }
+                        
+                    }, 100)
+
+                    //RANDOMSPAWN
+                
+                    setInterval(() => {
+                        if(this.pause) return;
+                        if(!this.game) return;
+                        let i = 0
+                        while(i != this.multiplicator) {
+                            if(i != 3) {
+                                i++
+                                this.newBlock()
+                            }
+                        }
+                    }, 1000 * Math.random() + this.speedBase);
+
+                    setInterval(() => {
+
+                        if(this.game == false) return;
+                        let canvas = document.getElementById("canvas");
+                        if (!canvas.getContext) return;
+                        let ctx = canvas.getContext("2d");
+
+                        let i = 0
+                        this.blocks.forEach(b => {
+
+                            //COLLISION
+
+                            if(this.invicible) return;
+
+                            var rect1 = {x: this.pos.x, y: this.pos.y, width: 50, height: 50}
+                            var rect2 = {x: b.pos.x + 5, y: b.pos.y + 5, width: 45, height: 45}
+
+                            if (rect1.x < rect2.x + rect2.width &&
+                                rect1.x + rect1.width > rect2.x &&
+                                rect1.y < rect2.y + rect2.height &&
+                                rect1.height + rect1.y > rect2.y) {
+                                    
+                                    if(b.type == true) {
+                                        if(b.taken) return;
+                                        this.life ++
+                                        this.blocks[i].taken = true
+                                        this.winLife = true
+                                        setTimeout(() => {
+                                            this.winLife = false
+                                        }, 2000);
+                                    } else {
+                                        this.lostLife()
+                                    }
+                            }
+                        i++
+                        })
+                    }, 100);
+                }
+            })
+        </script>
+        <style>
+            .info {
+                text-align: center;
+            }
+            div .button {
+                position: absolute;
+                left: 1230px;
+                top: 400px
+
+            }
+            #menu {
+                font-size: 70px;
+                color: red;
+                padding: 30px;
+                font-family: Andale Mono, monospace;
+            }
+            canvas {
+                position: relative;
+                top: 30px
+            }
+            footer {
+                padding-top: 10%;
+            }
+            button {
+                text-align: center;
+                padding: 14px 27.5px;
+                border: none;
+                background-color: red;
+                color: white;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 15px;
+                transition-duration: 0.5s;
+            }
+
+            button:hover {
+                background-color: white;
+                color: red;
+            }
+        </style>
+    </body>
+</html>
