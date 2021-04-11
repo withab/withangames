@@ -179,7 +179,7 @@
                         this.oldScore = this.score
                         this.score = 0
                         this.pos = {
-                            x: 500,
+                            x: 550,
                             y: 250
                         }
                         this.life = 3
@@ -218,36 +218,6 @@
                         }
                     })
 
-                    let upclicked = false
-                    let downclicked = false
-                    let leftclicked = false
-                    let rightclicked = false
-                    document.getElementById('up').onmousedown = function(){
-                        upclicked = true
-                        document.getElementById('up').onmouseup = function(){
-                        upclicked = false
-                        }
-                    }
-                    document.getElementById('down').onmousedown = function(){
-                        downclicked = true
-                        document.getElementById('down').onmouseup = function(){
-                        downclicked = false
-                        }
-                    }
-                    document.getElementById('left').onmousedown = function(){
-                        leftclicked = true
-                        document.getElementById('left').onmouseup = function(){
-                        leftclicked = false
-                        }
-                    }
-                    document.getElementById('right').onmousedown = function(){
-                        rightclicked = true
-                        document.getElementById('right').onmouseup = function(){
-                        rightclicked = false
-                        }
-                    }
-                    
-
 
                     this.draw()
 
@@ -260,18 +230,6 @@
                         if(this.score > this.bestScore) this.bestScore = this.score
 
                         this.multiplicator = (Math.floor(this.score / 500) + 1)
-
-
-                        if(upclicked == true) {
-                            this.up()
-                        } else if(downclicked == true) {
-                            this.down()
-                        } else if(leftclicked == true) {
-                            this.left()
-                        }
-                        else if(rightclicked == true) {
-                            this.right()
-                        }
                         
                     }, 100)
 
