@@ -29,10 +29,13 @@
                 </canvas>
             </div>
             <div class="button">
-                <button @click="left()" id="left">GAUCHE</button> <button @click="up()" id="up">HAUT</button> <button @click="right()" id="right">DROITE</button> 
+                <button @click="up()" id="up">HAUT</button>
                 <br />
                 <br />
-                ----------------------- <button @click="down()" id="down">BAS</button> ----------------------
+                <button @click="left()" id="left">GAUCHE</button> <button @click="right()" id="right">DROITE</button> 
+                <br />
+                <br />
+                <button @click="down()" id="down">BAS</button>
             </div>
             <br />
             <br />
@@ -333,7 +336,7 @@
             div .button {
                 position: absolute;
                 left: 1120px;
-                top: 400px
+                top: 350px
 
             }
             #menu {
@@ -358,10 +361,18 @@
                 font-size: 15px;
                 transition-duration: 0.5s;
             }
-
             button:hover {
                 background-color: white;
                 color: red;
+            }
+            
+            a {
+                outline: none;
+                text-decoration: none;
+                padding: 2px 1px 0;
+            }
+            a:link {
+                color: #265301;
             }
         </style>
     </body>
