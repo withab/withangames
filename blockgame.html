@@ -25,7 +25,7 @@
                 <br />
             </div>
             <div class="canvas">
-                <canvas id="canvas" width="1200" height="300" style="border:1px solid #000000;">
+                <canvas id="canvas" width="1100" height="300" style="border:1px solid #000000;">
                 </canvas>
             </div>
             <div class="button">
@@ -43,6 +43,9 @@
                 <h2 id="lostLife" v-if="lostLifeV" style="color: red;">-1 Vie !</h2>
             </div>
             </div>
+            <br />
+            <br />
+            <br />
             <footer>By withan, 2021, BlockGame v1.1, no copyright, <a href="https://github.com/withab/blockgame">GitHub</a> </footer>
         </div>
 
@@ -81,7 +84,7 @@
                         if (!canvas.getContext) return;
                         let ctx = canvas.getContext("2d");
 
-                        ctx.clearRect(0, 0, 1200, 300)
+                        ctx.clearRect(0, 0, 1100, 300)
 
                         ctx.fillStyle = 'BLACK';
                         ctx.fillRect(this.pos.x, this.pos.y, 50, 50);
@@ -115,7 +118,7 @@
                     },
                     right: function() {
                         if(this.pause) return;
-                        if(this.pos.x == 1150) return;
+                        if(this.pos.x == 1050) return;
                         this.oldPos == this.pos
                         this.pos.x = this.pos.x + 10 
                     },
@@ -148,7 +151,7 @@
                             type: Btype,
                             size: size,
                             pos: {
-                                x: 1150,
+                                x: 1050,
                                 y: height
                             },
                             color: Bcolor,
@@ -342,9 +345,6 @@
             canvas {
                 position: relative;
                 top: 30px
-            }
-            footer {
-                padding-top: 10%;
             }
             button {
                 text-align: center;
